@@ -1,0 +1,19 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Large, regenerable SUMO artifacts (rebuild via run_all.sh + run_analysis.sh):
+# every .xml here is generated — the network, the multi-hundred-MB route files,
+# and all per-run tripinfo / summary / edgedata / statistics outputs.
+data/osm/
+sim/
+*.xml
+*.log
+
+# Kept in the repo: source (scripts/), config (*.yaml, *.csv), the real DDOT
+# count input (data/counts/*.geojson), and results (*.json, *.png, *.md,
+# output/dashboard.html).
+
+# OS
+.DS_Store

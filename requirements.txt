@@ -1,0 +1,17 @@
+# SUMO simulator + Python bindings (binaries ship inside the eclipse-sumo wheel)
+eclipse-sumo==1.27.1
+traci
+sumolib
+
+# Data fetching + processing
+requests
+numpy
+pandas
+pyyaml
+
+# Reporting
+matplotlib
+pyproj
+scipy
+scikit-learn
+tensorflow

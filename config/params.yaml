@@ -1,0 +1,93 @@
+# Baseline configuration for the downtown DC SUMO simulation.
+# Every stage reads from here so the pipeline is tunable in one place.
+
+# ---------------------------------------------------------------------------
+# Geographic scope: downtown DC core (dense signalized grid).
+# bbox = [west_lon, south_lat, east_lon, north_lat]
+# Covers roughly the White House / K St / Penn Ave / Mt Vernon Sq downtown area.
+# ---------------------------------------------------------------------------
+bbox: [-77.050, 38.895, -77.005, 38.912]
+
+# ---------------------------------------------------------------------------
+# Real count data (DDOT AADT, DC Open Data ArcGIS REST service).
+# We try `year` first and fall back to `year_fallback` if in-box coverage is thin.
+# ---------------------------------------------------------------------------
+counts:
+  rest_url: "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Transportation_TrafficVolume_WebMercator/MapServer/5"
+  year: 2024
+  year_fallback: 2023
+  # Fraction of a segment's bidirectional AADT assigned to each directional edge.
+  direction_split: 0.5
+  # Max distance (m) an AADT polyline midpoint may be from a SUMO edge to match.
+  match_max_dist_m: 25.0
+
+# ---------------------------------------------------------------------------
+# Simulation window: full 24h average weekday.
+# ---------------------------------------------------------------------------
+sim:
+  begin: 0
+  end: 86400            # 24 hours in seconds
+  step_length: 1.0
+  truck_fraction: 0.05  # small share of heavy vehicles
+  aggregation_s: 3600   # edgeData / reporting bin = 1 hour
+  emissions: false      # off by default for the 24h run (large output); toggle on if needed
+  seed: 42
+  # 24h city-scale demand is run mesoscopically: far faster and robust against the
+  # deadlock a full micro run hits under fixed-time signals. The V2X peak comparison
+  # stays microscopic (per-vehicle signal control). Rerouting device models drivers
+  # avoiding jams (prevents unrealistic gridlock collapse).
+  mesoscopic: true
+  rerouting: true
+  reroute_period_s: 300
+  # Full AADT-level demand (~939k veh/day) oversaturates this ~2km downtown
+  # subnetwork by ~3x (AADT reflects throughput the real city achieves with
+  # efficient signals + a much larger surrounding network). demand_scale sets the
+  # stable, realistic operating point (~11 mph, ~few % teleports) used for the
+  # baseline and the V2X comparison alike.
+  demand_scale: 0.2
+
+# ---------------------------------------------------------------------------
+# Demand generation (routeSampler candidate pool).
+# ---------------------------------------------------------------------------
+demand:
+  # randomTrips insertion period (s). Smaller => larger candidate route pool =>
+  # more distinct routes => better count-matching (at the cost of generation time).
+  trip_period: 0.15
+
+# ---------------------------------------------------------------------------
+# V2X experiment (Phase C). Compared against a same-window fixed-signal control
+# so baseline vs V2X is apples-to-apples. TraCI control is per-step, so we use a
+# bounded peak window rather than the full 24h.
+# ---------------------------------------------------------------------------
+v2x:
+  peak_begin: 25200        # 07:00
+  peak_end: 32400          # 09:00 (AM peak, 2h)
+  penetration: 1.0         # fraction of vehicles equipped with V2X
+  comm_range_m: 200.0      # V2I/V2V communication radius
+  # V2I adaptive signals (max-pressure / queue-actuated)
+  control_interval_s: 5    # how often signals re-evaluate pressure
+  min_green_s: 10          # minimum green before a phase may switch
+  max_green_s: 60          # force rotation after this (anti-starvation)
+  wait_weight: 0.25        # weight on accumulated approach waiting-time in pressure
+  yellow_s: 3              # yellow duration on a phase switch
+  # V2V congestion sharing + rerouting
+  reroute_interval_s: 60   # equipped vehicles reroute on shared travel-times this often
+  penetration_sweep: [0.0, 0.2, 0.5, 1.0]  # optional sensitivity sweep
+
+# ---------------------------------------------------------------------------
+# Calibration harness (Phase B): tune a global demand scale to minimise flow
+# error (MAPE/RMSE) vs real AADT counts on a fast window.
+# ---------------------------------------------------------------------------
+calibration:
+  window_begin: 25200
+  window_end: 28800        # 1h calibration window (fast)
+  scale_grid: [0.2, 0.3, 0.5, 0.8, 1.0]  # demand scale factors to search (2h-warmed window)
+  target_mape: 0.10        # <10% flow error goal
+
+# ---------------------------------------------------------------------------
+# ML pipeline (Phase D): peak-hour demand forecasting + adaptive routing.
+# ---------------------------------------------------------------------------
+ml:
+  n_days: 120              # synthetic multi-day hourly demand history to learn from
+  test_days: 30
+  seed: 7
