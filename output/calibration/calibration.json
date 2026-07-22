@@ -1,0 +1,220 @@
+{
+  "target_mape": 0.1,
+  "demand_calibration": {
+    "available": true,
+    "geh_lt5_pct_mean": 83.1,
+    "geh_lt5_pct_min": 78.8,
+    "geh_lt5_pct_max": 92.4,
+    "note": "routeSampler fits per-hour edge flows to real DDOT AADT counts; GEH<5 is the FHWA link-flow acceptance metric."
+  },
+  "validation_24h": {
+    "available": true,
+    "overall": {
+      "n_edges": 32976,
+      "mape": 0.8182,
+      "rmse": 405.35,
+      "geh_lt5_pct": 9.0
+    },
+    "by_hour": {
+      "0": {
+        "n_edges": 1374,
+        "mape": 0.8316,
+        "rmse": 68.86,
+        "geh_lt5_pct": 17.3
+      },
+      "1": {
+        "n_edges": 1374,
+        "mape": 0.8302,
+        "rmse": 42.5,
+        "geh_lt5_pct": 32.2
+      },
+      "2": {
+        "n_edges": 1374,
+        "mape": 0.8265,
+        "rmse": 33.98,
+        "geh_lt5_pct": 43.7
+      },
+      "3": {
+        "n_edges": 1374,
+        "mape": 0.8298,
+        "rmse": 34.12,
+        "geh_lt5_pct": 41.2
+      },
+      "4": {
+        "n_edges": 1374,
+        "mape": 0.8261,
+        "rmse": 60.19,
+        "geh_lt5_pct": 21.6
+      },
+      "5": {
+        "n_edges": 1374,
+        "mape": 0.8287,
+        "rmse": 137.96,
+        "geh_lt5_pct": 5.3
+      },
+      "6": {
+        "n_edges": 1374,
+        "mape": 0.8224,
+        "rmse": 329.15,
+        "geh_lt5_pct": 2.7
+      },
+      "7": {
+        "n_edges": 1374,
+        "mape": 0.8191,
+        "rmse": 564.12,
+        "geh_lt5_pct": 2.0
+      },
+      "8": {
+        "n_edges": 1374,
+        "mape": 0.8136,
+        "rmse": 588.63,
+        "geh_lt5_pct": 1.6
+      },
+      "9": {
+        "n_edges": 1374,
+        "mape": 0.809,
+        "rmse": 473.18,
+        "geh_lt5_pct": 2.5
+      },
+      "10": {
+        "n_edges": 1374,
+        "mape": 0.8141,
+        "rmse": 432.02,
+        "geh_lt5_pct": 1.9
+      },
+      "11": {
+        "n_edges": 1374,
+        "mape": 0.8155,
+        "rmse": 457.08,
+        "geh_lt5_pct": 2.4
+      },
+      "12": {
+        "n_edges": 1374,
+        "mape": 0.8179,
+        "rmse": 493.99,
+        "geh_lt5_pct": 2.0
+      },
+      "13": {
+        "n_edges": 1374,
+        "mape": 0.8142,
+        "rmse": 484.26,
+        "geh_lt5_pct": 2.2
+      },
+      "14": {
+        "n_edges": 1374,
+        "mape": 0.8128,
+        "rmse": 509.69,
+        "geh_lt5_pct": 2.5
+      },
+      "15": {
+        "n_edges": 1374,
+        "mape": 0.8176,
+        "rmse": 571.46,
+        "geh_lt5_pct": 2.1
+      },
+      "16": {
+        "n_edges": 1374,
+        "mape": 0.816,
+        "rmse": 641.74,
+        "geh_lt5_pct": 1.5
+      },
+      "17": {
+        "n_edges": 1374,
+        "mape": 0.8137,
+        "rmse": 658.13,
+        "geh_lt5_pct": 1.8
+      },
+      "18": {
+        "n_edges": 1374,
+        "mape": 0.8017,
+        "rmse": 523.17,
+        "geh_lt5_pct": 2.8
+      },
+      "19": {
+        "n_edges": 1374,
+        "mape": 0.8088,
+        "rmse": 396.14,
+        "geh_lt5_pct": 2.8
+      },
+      "20": {
+        "n_edges": 1374,
+        "mape": 0.8131,
+        "rmse": 301.2,
+        "geh_lt5_pct": 3.4
+      },
+      "21": {
+        "n_edges": 1374,
+        "mape": 0.8163,
+        "rmse": 232.27,
+        "geh_lt5_pct": 3.8
+      },
+      "22": {
+        "n_edges": 1374,
+        "mape": 0.8179,
+        "rmse": 154.17,
+        "geh_lt5_pct": 5.8
+      },
+      "23": {
+        "n_edges": 1374,
+        "mape": 0.8207,
+        "rmse": 102.29,
+        "geh_lt5_pct": 10.7
+      }
+    }
+  },
+  "auto_tuning": {
+    "window": [
+      25200,
+      28800
+    ],
+    "warmup_begin": 18000,
+    "results": [
+      {
+        "n_edges": 1374,
+        "mape": 0.9055,
+        "rmse": 1238.96,
+        "geh_lt5_pct": 0.1,
+        "scale": 0.2
+      },
+      {
+        "n_edges": 1374,
+        "mape": 0.856,
+        "rmse": 1198.59,
+        "geh_lt5_pct": 0.6,
+        "scale": 0.3
+      },
+      {
+        "n_edges": 1374,
+        "mape": 0.7557,
+        "rmse": 1132.06,
+        "geh_lt5_pct": 3.5,
+        "scale": 0.5
+      },
+      {
+        "n_edges": 1374,
+        "mape": 0.7323,
+        "rmse": 1148.83,
+        "geh_lt5_pct": 4.4,
+        "scale": 0.8
+      },
+      {
+        "n_edges": 1374,
+        "mape": 0.7977,
+        "rmse": 1191.33,
+        "geh_lt5_pct": 2.0,
+        "scale": 1.0
+      }
+    ],
+    "best": {
+      "n_edges": 1374,
+      "mape": 0.7323,
+      "rmse": 1148.83,
+      "geh_lt5_pct": 4.4,
+      "scale": 0.8
+    }
+  },
+  "operating_scale": 0.2,
+  "best_scale": 0.8,
+  "best_mape": 0.7323,
+  "goal_met": false
+}

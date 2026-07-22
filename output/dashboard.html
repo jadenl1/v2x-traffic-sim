@@ -1,0 +1,184 @@
+<title>V2X Traffic Sim — Washington, DC</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --ink:#12161d; --muted:#5b6572; --hair:#e4e8ee;
+  --accent:#c9821f; --accent-soft:#f4e6cf;
+  --good:#12805c; --good-soft:#dcefe6; --bad:#c23a4b; --bad-soft:#f6dee1;
+  --shadow:0 1px 2px rgba(16,22,34,.06),0 8px 24px rgba(16,22,34,.05);
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0e1420; --panel:#161d2b; --ink:#e7ebf2; --muted:#8b95a6; --hair:#232c3d;
+    --accent:#e8a13a; --accent-soft:#3a2f18;
+    --good:#3ecf94; --good-soft:#123227; --bad:#f0788a; --bad-soft:#341920;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1420; --panel:#161d2b; --ink:#e7ebf2; --muted:#8b95a6; --hair:#232c3d;
+  --accent:#e8a13a; --accent-soft:#3a2f18;
+  --good:#3ecf94; --good-soft:#123227; --bad:#f0788a; --bad-soft:#341920;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+}
+:root[data-theme="light"]{
+  --bg:#f6f7f9; --panel:#ffffff; --ink:#12161d; --muted:#5b6572; --hair:#e4e8ee;
+  --accent:#c9821f; --accent-soft:#f4e6cf;
+  --good:#12805c; --good-soft:#dcefe6; --bad:#c23a4b; --bad-soft:#f6dee1;
+  --shadow:0 1px 2px rgba(16,22,34,.06),0 8px 24px rgba(16,22,34,.05);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);margin:0;
+  line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1060px;margin:0 auto;padding:2.4rem 1.5rem 4rem}
+.eyebrow{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  font-weight:700;font-family:var(--mono)}
+h1{font-size:clamp(1.7rem,3.4vw,2.5rem);line-height:1.08;margin:.5rem 0 .4rem;
+  letter-spacing:-.02em;text-wrap:balance;font-weight:750}
+.lede{color:var(--muted);max-width:60ch;font-size:1rem}
+.context{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.1rem}
+.tag{font-family:var(--mono);font-size:.74rem;color:var(--muted);background:var(--panel);
+  border:1px solid var(--hair);border-radius:999px;padding:.28rem .7rem}
+h2{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  font-weight:700;margin:2.6rem 0 .9rem;display:flex;align-items:center;gap:.6rem}
+h2::after{content:"";flex:1;height:1px;background:var(--hair)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+.kpi{background:var(--panel);border:1px solid var(--hair);border-radius:14px;
+  padding:1.15rem 1.2rem;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi .lab{font-size:.76rem;color:var(--muted);font-weight:600}
+.kpi .big{font-family:var(--mono);font-size:2.1rem;font-weight:650;margin:.35rem 0 .1rem;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi .sub{font-size:.78rem;color:var(--muted);font-family:var(--mono)}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.rail{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.panel{background:var(--panel);border:1px solid var(--hair);border-radius:14px;
+  box-shadow:var(--shadow);overflow:hidden}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:520px}
+th,td{padding:.72rem 1rem;text-align:right;font-variant-numeric:tabular-nums;
+  font-family:var(--mono)}
+th:first-child,td:first-child{text-align:left;font-family:var(--sans)}
+thead th{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+  font-weight:700;border-bottom:1px solid var(--hair)}
+tbody tr+tr td{border-top:1px solid var(--hair)}
+tbody td:first-child{font-weight:600}
+.chip{display:inline-block;font-family:var(--mono);font-size:.78rem;font-weight:650;
+  padding:.12rem .5rem;border-radius:6px;font-variant-numeric:tabular-nums}
+.chip.g{color:var(--good);background:var(--good-soft)}
+.chip.b{color:var(--bad);background:var(--bad-soft)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:680px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--hair);border-radius:14px;
+  padding:1.2rem 1.3rem;box-shadow:var(--shadow)}
+.card h3{margin:0 0 .2rem;font-size:1rem}
+.card p{margin:.15rem 0 .9rem;color:var(--muted);font-size:.85rem}
+.bar{display:flex;align-items:center;gap:.7rem;margin:.5rem 0;font-size:.84rem}
+.bar .name{width:120px;color:var(--muted);font-family:var(--mono);font-size:.78rem}
+.bar .track{flex:1;height:8px;background:var(--hair);border-radius:99px;overflow:hidden}
+.bar .fill{height:100%;border-radius:99px;background:var(--accent)}
+.bar .val{width:64px;text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:.8rem}
+.note{margin-top:2.4rem;border:1px dashed var(--hair);border-radius:12px;padding:1.1rem 1.3rem}
+.note strong{color:var(--accent)}
+.note ol{margin:.5rem 0 0;padding-left:1.2rem;color:var(--muted);font-size:.86rem}
+.note li{margin:.3rem 0}
+.foot{margin-top:2rem;color:var(--muted);font-size:.78rem;font-family:var(--mono)}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">SUMO Microsimulation · V2X Study</div>
+  <h1>Vehicle-to-Everything vs. a Real-Count Baseline</h1>
+  <p class="lede">Downtown Washington, DC. Traffic demand calibrated to real DDOT AADT
+  counts, then adaptive signal coordination (V2I) and cooperative rerouting (V2V) measured
+  against a fixed-signal control. Every figure is measured simulation output.</p>
+  <div class="context">
+    <span class="tag">2,241 edges · 299 signals</span>
+    <span class="tag">939k trips/day demand</span>
+    <span class="tag">AM-peak comparison</span>
+    <span class="tag">demand GEH&lt;5 = 83%</span>
+  </div>
+
+  <h2>V2X impact — per-trip, AM peak</h2>
+  <div class="kpis">
+    <div class="kpi"><span class="rail"></span>
+      <div class="lab">Travel time — V2I signals</div>
+      <div class="big neg">−7.6%</div>
+      <div class="sub">348s → 322s</div></div>
+    <div class="kpi">
+      <div class="lab">Delay (time-loss) — full V2X</div>
+      <div class="big neg">−11.1%</div>
+      <div class="sub">275s → 244s</div></div>
+    <div class="kpi">
+      <div class="lab">Waiting time — full V2X</div>
+      <div class="big neg">−17.2%</div>
+      <div class="sub">220s → 182s</div></div>
+    <div class="kpi">
+      <div class="lab">Mean speed — full V2X</div>
+      <div class="big pos">+26.2%</div>
+      <div class="sub">11.9 → 15.1 mph</div></div>
+  </div>
+
+  <h2>Three-arm comparison</h2>
+  <div class="panel tbl-scroll">
+    <table>
+      <thead><tr>
+        <th>Metric / trip</th><th>Baseline</th>
+        <th>V2I (signals)</th><th>Δ</th>
+        <th>Full V2X</th><th>Δ</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Travel time</td><td>348.0s</td><td>321.6s</td><td><span class="chip g">−7.6%</span></td><td>325.4s</td><td><span class="chip g">−6.5%</span></td></tr>
+        <tr><td>Delay (time-loss)</td><td>274.7s</td><td>248.1s</td><td><span class="chip g">−9.7%</span></td><td>244.2s</td><td><span class="chip g">−11.1%</span></td></tr>
+        <tr><td>Waiting time</td><td>219.5s</td><td>191.4s</td><td><span class="chip g">−12.8%</span></td><td>181.7s</td><td><span class="chip g">−17.2%</span></td></tr>
+        <tr><td>Mean speed</td><td>11.9mph</td><td>15.0mph</td><td><span class="chip g">+25.3%</span></td><td>15.1mph</td><td><span class="chip g">+26.2%</span></td></tr>
+        <tr><td>Teleports</td><td>1202</td><td>1670</td><td><span class="chip b">+38.9%</span></td><td>1591</td><td><span class="chip b">+32.4%</span></td></tr>
+        <tr><td>Trips completed</td><td>31811</td><td>31728</td><td><span class="chip b">−0.3%</span></td><td>31256</td><td><span class="chip b">−1.7%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Calibration &amp; forecasting</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Demand calibration</h3>
+      <p>routeSampler fits per-hour edge flows to real DDOT AADT counts. GEH&lt;5 is the
+      FHWA link-flow acceptance metric (target ≥85%).</p>
+      <div class="bar"><span class="name">GEH&lt;5 mean</span><span class="track"><span class="fill" style="width:83%"></span></span><span class="val">83%</span></div>
+      <div class="bar"><span class="name">best hour</span><span class="track"><span class="fill" style="width:92%"></span></span><span class="val">92%</span></div>
+      <div class="bar"><span class="name">worst hour</span><span class="track"><span class="fill" style="width:79%"></span></span><span class="val">79%</span></div>
+    </div>
+    <div class="card">
+      <h3>ML peak-demand forecast</h3>
+      <p>Forecast error (MAPE) vs a naive same-hour-yesterday baseline. Best model beats
+      naive by <strong style="color:var(--good)">60% RMSE</strong>.</p>
+      <div class="bar"><span class="name">Naive</span><span class="track"><span class="fill" style="width:100%;background:var(--muted)"></span></span><span class="val">21.7%</span></div>
+      <div class="bar"><span class="name">RandomForest</span><span class="track"><span class="fill" style="width:36%"></span></span><span class="val">7.9%</span></div>
+      <div class="bar"><span class="name">GradBoost</span><span class="track"><span class="fill" style="width:46%"></span></span><span class="val">10.1%</span></div>
+      <div class="bar"><span class="name">TensorFlow NN</span><span class="track"><span class="fill" style="width:47%"></span></span><span class="val">10.2%</span></div>
+    </div>
+  </div>
+
+  <h2>24-hour baseline (control)</h2>
+  <div class="kpis">
+    <div class="kpi"><div class="lab">Completed trips</div><div class="big">187,684</div><div class="sub">full day, meso</div></div>
+    <div class="kpi"><div class="lab">Mean travel time</div><div class="big">4.7<span style="font-size:1rem"> min</span></div><div class="sub">284 s / trip</div></div>
+    <div class="kpi"><div class="lab">Network mean speed</div><div class="big">13.7</div><div class="sub">mph · realistic downtown</div></div>
+    <div class="kpi"><div class="lab">Total delay</div><div class="big">11,866</div><div class="sub">vehicle-hours</div></div>
+  </div>
+
+  <div class="note">
+    <strong>Honest caveats</strong> — read before quoting.
+    <ol>
+      <li>Full AADT demand oversaturates this ~2km grid ~3×; runs use a stable scale (0.2)
+      for realistic speeds, so <em>realised</em> flow undershoots raw counts (demand itself
+      is still calibrated, GEH&lt;5 83%). A known limitation of isolated subnetworks.</li>
+      <li>Adaptive signals teleport ~35% more vehicles — a few side approaches still starve
+      past the 300s threshold. Net delay/speed still improve; this is the next fix.</li>
+      <li>Baseline signals are netconvert's guessed fixed-time plans, not DDOT's real timing.</li>
+      <li>V2X measured on the AM-peak window (both arms identical demand/window — deltas are fair).</li>
+    </ol>
+  </div>
+
+  <div class="foot">Generated from output/compare/comparison.json · SUMO 1.27.1 · TraCI max-pressure control</div>
+</div>

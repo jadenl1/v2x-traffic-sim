@@ -1,0 +1,178 @@
+{
+  "scenario": "downtown_dc_baseline",
+  "window_h": 24,
+  "vehicles": {
+    "loaded": 939225,
+    "inserted": 187845,
+    "running": 161,
+    "waiting": 0
+  },
+  "trip_means": {
+    "count": 187684,
+    "travel_time_s": 283.85,
+    "delay_time_loss_s": 227.59,
+    "waiting_time_s": 107.9,
+    "route_length_m": 989.84,
+    "depart_delay_s": 9.26,
+    "speed_mps": 6.14,
+    "speed_mph": 13.73
+  },
+  "teleports": {
+    "total": 6954,
+    "jam": 6954,
+    "yield": 0,
+    "wrongLane": 0
+  },
+  "totals": {
+    "completed_trips": 187684,
+    "vehicle_hours_delay": 11865.6,
+    "vehicle_km_travelled": 185777.3
+  },
+  "hourly": [
+    {
+      "hour": 0,
+      "running_mean": 95.6,
+      "running_max": 123,
+      "speed_mean_mph": 16.0
+    },
+    {
+      "hour": 1,
+      "running_mean": 63.4,
+      "running_max": 97,
+      "speed_mean_mph": 15.16
+    },
+    {
+      "hour": 2,
+      "running_mean": 48.5,
+      "running_max": 68,
+      "speed_mean_mph": 14.62
+    },
+    {
+      "hour": 3,
+      "running_mean": 51.4,
+      "running_max": 64,
+      "speed_mean_mph": 14.44
+    },
+    {
+      "hour": 4,
+      "running_mean": 83.9,
+      "running_max": 104,
+      "speed_mean_mph": 15.64
+    },
+    {
+      "hour": 5,
+      "running_mean": 182.4,
+      "running_max": 219,
+      "speed_mean_mph": 17.79
+    },
+    {
+      "hour": 6,
+      "running_mean": 474.9,
+      "running_max": 585,
+      "speed_mean_mph": 22.29
+    },
+    {
+      "hour": 7,
+      "running_mean": 916.7,
+      "running_max": 1144,
+      "speed_mean_mph": 26.58
+    },
+    {
+      "hour": 8,
+      "running_mean": 1032.3,
+      "running_max": 1247,
+      "speed_mean_mph": 27.59
+    },
+    {
+      "hour": 9,
+      "running_mean": 945.7,
+      "running_max": 1159,
+      "speed_mean_mph": 27.82
+    },
+    {
+      "hour": 10,
+      "running_mean": 734.5,
+      "running_max": 829,
+      "speed_mean_mph": 25.42
+    },
+    {
+      "hour": 11,
+      "running_mean": 776.5,
+      "running_max": 951,
+      "speed_mean_mph": 25.0
+    },
+    {
+      "hour": 12,
+      "running_mean": 820.1,
+      "running_max": 968,
+      "speed_mean_mph": 25.21
+    },
+    {
+      "hour": 13,
+      "running_mean": 855.9,
+      "running_max": 970,
+      "speed_mean_mph": 25.91
+    },
+    {
+      "hour": 14,
+      "running_mean": 909.3,
+      "running_max": 1065,
+      "speed_mean_mph": 26.69
+    },
+    {
+      "hour": 15,
+      "running_mean": 1067.6,
+      "running_max": 1322,
+      "speed_mean_mph": 26.88
+    },
+    {
+      "hour": 16,
+      "running_mean": 1192.3,
+      "running_max": 1417,
+      "speed_mean_mph": 26.76
+    },
+    {
+      "hour": 17,
+      "running_mean": 1387.9,
+      "running_max": 1515,
+      "speed_mean_mph": 28.73
+    },
+    {
+      "hour": 18,
+      "running_mean": 1170.1,
+      "running_max": 1492,
+      "speed_mean_mph": 27.75
+    },
+    {
+      "hour": 19,
+      "running_mean": 743.5,
+      "running_max": 1037,
+      "speed_mean_mph": 24.61
+    },
+    {
+      "hour": 20,
+      "running_mean": 488.7,
+      "running_max": 709,
+      "speed_mean_mph": 22.26
+    },
+    {
+      "hour": 21,
+      "running_mean": 370.7,
+      "running_max": 433,
+      "speed_mean_mph": 22.34
+    },
+    {
+      "hour": 22,
+      "running_mean": 237.8,
+      "running_max": 318,
+      "speed_mean_mph": 20.91
+    },
+    {
+      "hour": 23,
+      "running_mean": 162.8,
+      "running_max": 235,
+      "speed_mean_mph": 18.89
+    }
+  ],
+  "worst_edges": []
+}

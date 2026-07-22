@@ -1,0 +1,51 @@
+{
+  "nn_backend": "tensorflow-keras",
+  "n_days": 120,
+  "test_days": 30,
+  "features": [
+    "dow",
+    "hour",
+    "is_weekend",
+    "rain",
+    "lag24",
+    "lag168",
+    "roll24",
+    "hour_sin",
+    "hour_cos"
+  ],
+  "results": {
+    "baseline_naive": {
+      "rmse": 103710.0,
+      "mape": 21.74
+    },
+    "random_forest": {
+      "rmse": 44373.7,
+      "mape": 7.92
+    },
+    "grad_boost": {
+      "rmse": 47068.9,
+      "mape": 10.08
+    },
+    "tensorflow-keras": {
+      "rmse": 41088.9,
+      "mape": 10.22
+    }
+  },
+  "best_model": "tensorflow-keras",
+  "improvement_vs_naive_pct": 60.4,
+  "adaptive_routing_policy": {
+    "peak_hours": [
+      7,
+      8,
+      15,
+      16,
+      17,
+      18
+    ],
+    "reroute_interval_s": {
+      "peak": 30,
+      "offpeak": 120
+    },
+    "note": "During forecast peak hours the V2X controller reroutes equipped vehicles twice as often to pre-empt predicted congestion."
+  }
+}
