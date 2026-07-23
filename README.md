@@ -71,6 +71,22 @@ baseline network + demand from `run_all.sh`).
 | D · ML | `scripts/09_ml_forecast.py` | Peak-hour demand forecasting (RandomForest / GradientBoosting / **TensorFlow-Keras** NN) vs a naive baseline, + adaptive-routing policy → `output/ml/forecast.json` |
 | E · Compare | `scripts/10_compare.py` | Baseline-vs-V2X deltas + a self-contained HTML **dashboard** → `output/compare/comparison.json`, `output/dashboard.html` |
 
+## Replay viewer (`viz/`)
+
+A React + Vite web app that animates the simulation: each vehicle is a dot coloured
+by speed (red = queued, green = free-flow) over the real downtown road network, with
+play/scrub controls and a **baseline ⇄ V2X toggle** so you can watch congestion clear
+under adaptive signals. A live HUD reads out on-screen vehicle count, mean speed, and the
+delta vs the other scenario.
+
+```bash
+python scripts/11_export_replay.py   # regenerate viz/public/sim.json (short peak window)
+cd viz && npm install && npm run dev # open the printed localhost URL
+```
+
+The replay data (`viz/public/sim.json`, ~1.4 MB) is committed, so `npm install && npm run
+dev` works out of the box without re-running SUMO.
+
 ### V2X model
 
 - **V2I (adaptive signals):** each signal runs max-pressure control over its
