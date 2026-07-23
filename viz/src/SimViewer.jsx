@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 
-// speed (m/s) -> colour ramp: stopped=red, mid=amber, free-flow=green
+// speed (m/s) -> ramp, deepened for legibility on the white plate
 function speedColor(s) {
   const t = Math.max(0, Math.min(1, s / 14))
   if (t < 0.5) {
     const k = t / 0.5
-    return `rgb(${222 + (232 - 222) * k},${74 + (163 - 74) * k},${63 + (60 - 63) * k})`
+    return `rgb(${222 + (198 - 222) * k},${42 + (122 - 42) * k},${34 + (18 - 34) * k})`
   }
   const k = (t - 0.5) / 0.5
-  return `rgb(${232 + (74 - 232) * k},${163 + (198 - 163) * k},${60 + (140 - 60) * k})`
+  return `rgb(${198 + (18 - 198) * k},${122 + (146 - 122) * k},${18 + (90 - 18) * k})`
 }
 
 function meanSpeed(frame) {
@@ -18,12 +18,11 @@ function meanSpeed(frame) {
   return frame.length ? sum / (frame.length / 3) : 0
 }
 
-// headline findings (full-V2X arm, AM-peak comparison — measured)
 const FINDINGS = [
-  { v: '−6.5%', k: 'trip travel time', d: '348s → 325s' },
-  { v: '−11.1%', k: 'delay per trip', d: 'time lost to congestion' },
-  { v: '−17.2%', k: 'time spent waiting', d: 'at signals & queues' },
-  { v: '+26%', k: 'mean network speed', d: '11.9 → 15.1 mph' },
+  { i: '01', k: 'Trip travel time', from: '348 s', to: '325 s', d: '−6.5%' },
+  { i: '02', k: 'Delay per trip', from: '275 s', to: '244 s', d: '−11.1%' },
+  { i: '03', k: 'Time waiting', from: '220 s', to: '182 s', d: '−17.2%' },
+  { i: '04', k: 'Mean network speed', from: '11.9 mph', to: '15.1 mph', d: '+26.0%' },
 ]
 
 export default function SimViewer() {
@@ -62,8 +61,16 @@ export default function SimViewer() {
     const X = (x) => ox + x * scale
     const Y = (y) => oy + (h - y) * scale
 
-    // roads — faint warm lines on the dark instrument plate
-    ctx.strokeStyle = 'rgba(198,186,168,0.16)'
+    // coordinate grid, every 500 m
+    ctx.strokeStyle = 'rgba(20,24,40,0.05)'
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    for (let gx = 0; gx <= w; gx += 500) { ctx.moveTo(X(gx), Y(0)); ctx.lineTo(X(gx), Y(h)) }
+    for (let gy = 0; gy <= h; gy += 500) { ctx.moveTo(X(0), Y(gy)); ctx.lineTo(X(w), Y(gy)) }
+    ctx.stroke()
+
+    // road network
+    ctx.strokeStyle = 'rgba(24,28,42,0.30)'
     ctx.lineWidth = 1
     ctx.beginPath()
     for (const e of data.network) {
@@ -74,13 +81,23 @@ export default function SimViewer() {
 
     // vehicles
     const fr = frames[idx] || []
-    const r = Math.max(1.5, scale * 3)
+    const r = Math.max(1.4, scale * 3)
     for (let i = 0; i < fr.length; i += 3) {
       ctx.fillStyle = speedColor(fr[i + 2])
       ctx.beginPath()
       ctx.arc(X(fr[i]), Y(fr[i + 1]), r, 0, 6.283)
       ctx.fill()
     }
+
+    // scale bar (500 m) bottom-left
+    const bx = ox + 14, by = oy + h * scale - 16, len = 500 * scale
+    ctx.strokeStyle = 'rgba(24,28,42,0.65)'; ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(bx, by - 4); ctx.lineTo(bx, by); ctx.lineTo(bx + len, by); ctx.lineTo(bx + len, by - 4)
+    ctx.stroke()
+    ctx.fillStyle = 'rgba(24,28,42,0.65)'
+    ctx.font = '9px "Geist Mono Variable", monospace'
+    ctx.fillText('500 M', bx + 4, by - 6)
   }, [data, frames])
 
   useEffect(() => {
@@ -104,8 +121,8 @@ export default function SimViewer() {
     frameRef.current = v; setFrame(v); draw(v)
   }
 
-  if (err) return <div className="boot">Couldn’t load <code>sim.json</code> — {err}.<br />Run <code>python scripts/11_export_replay.py</code> first.</div>
-  if (!data) return <div className="boot">Loading simulation…</div>
+  if (err) return <div className="boot">FAULT — could not load <code>sim.json</code> ({err}).<br />Run <code>python scripts/11_export_replay.py</code>.</div>
+  if (!data) return <div className="boot">INITIALISING…</div>
 
   const fr = frames[frame] || []
   const onScreen = Math.round(fr.length / 3)
@@ -117,95 +134,98 @@ export default function SimViewer() {
   const clock = new Date((t0 + frame) * 1000).toISOString().substr(11, 8)
 
   return (
-    <div className="page">
-      <header className="masthead">
-        <div className="brand">
-          <span className="mark" aria-hidden="true"><i /><i /><i /></span>
-          Mobility&nbsp;Systems&nbsp;Lab
-        </div>
-        <div className="issue">Simulation Study — Washington, DC</div>
+    <div className="doc">
+      <header className="topbar">
+        <div className="sysid"><span className="dot" />MOBILITY-SYSTEMS-LAB</div>
+        <div className="rev">38.9047°N&nbsp;·&nbsp;77.0369°W&nbsp;/&nbsp;SIM-2026.07</div>
       </header>
 
-      <section className="hero">
-        <p className="kicker">Vehicle-to-Everything · Signal Coordination</p>
-        <h1>Watching a city’s morning rush learn to clear itself.</h1>
-        <p className="deck">A microscopic traffic simulation of downtown Washington, DC,
-        with demand calibrated to real DDOT counts. Replay the 7&nbsp;a.m. peak under today’s
-        fixed-time signals, then under vehicle-to-everything coordination — and watch the
-        queues drain.</p>
-      </section>
+      <main className="sheet">
+        <div className="ix">FIG.01 — VEHICLE-TO-EVERYTHING · SIGNAL COORDINATION</div>
+        <h1 className="statement">
+          Adaptive signals drain the morning peak <em>11% faster</em> than fixed timing.
+        </h1>
+        <p className="abstract">
+          Microscopic simulation of downtown Washington, DC — demand calibrated to real
+          DDOT counts (GEH&lt;5&nbsp;=&nbsp;83%). The same 07:00 peak, replayed under today’s
+          fixed-time signals and under vehicle-to-everything coordination.
+        </p>
 
-      <figure className="figure">
-        <div className="figbar">
-          <div className="tabs" role="tablist" aria-label="scenario">
-            {['baseline', 'v2x'].map((s) => (
-              <button key={s} role="tab" aria-selected={scenario === s}
-                className={scenario === s ? 'on' : ''} onClick={() => setScenario(s)}>
-                {s === 'v2x' ? 'V2X coordination' : 'Fixed-signal baseline'}
-              </button>
-            ))}
-          </div>
-          <div className="ramp" aria-hidden="true">
-            <span>stopped</span><i className="ramp-track" /><span>free-flow</span>
-          </div>
-        </div>
-
-        <div className="stage">
-          <canvas ref={canvasRef} />
-        </div>
-
-        <div className="telemetry">
-          <div className="controls">
-            <button className="play" onClick={() => setPlaying((p) => !p)}
-              aria-label={playing ? 'pause' : 'play'}>{playing ? '❚❚' : '►'}</button>
-            <input className="scrub" type="range" min={0} max={Math.max(0, nFrames - 1)}
-              value={frame} onChange={onScrub} aria-label="timeline" />
-          </div>
-          <div className="readout">
-            <span><b>{onScreen}</b> vehicles</span>
-            <span><b>{ms.toFixed(1)}</b> m/s avg</span>
-            <span><b>{clock}</b></span>
-            <span className={delta <= 0 ? 'd good' : 'd bad'}>
-              <b>{delta === 0 ? '±0' : (delta < 0 ? '−' : '+') + Math.abs(delta)}</b> vs {other === 'v2x' ? 'V2X' : 'baseline'}
-            </span>
-            <label className="spd">
-              <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))} aria-label="speed">
-                <option value={1}>1×</option><option value={2}>2×</option>
-                <option value={4}>4×</option><option value={8}>8×</option>
-              </select>
-            </label>
-          </div>
-        </div>
-
-        <figcaption>
-          <b>Fig. 1</b> — Each mark is a vehicle, coloured by instantaneous speed.
-          Reds pool at saturated intersections; greens run the arterials. Toggle the
-          scenario to compare the same minute of the peak. {data.network.length.toLocaleString()} road
-          segments, {data.window[0]}s–{data.window[1]}s, sampled at 1&nbsp;Hz from SUMO floating-car data.
-        </figcaption>
-      </figure>
-
-      <section className="findings">
-        <p className="kicker">What changes, measured</p>
-        <div className="stats">
-          {FINDINGS.map((f) => (
-            <div className="stat" key={f.k}>
-              <div className="num">{f.v}</div>
-              <div className="lab">{f.k}</div>
-              <div className="det">{f.d}</div>
+        <section className="fig">
+          <div className="fig-head">
+            <div className="scen" role="tablist">
+              {[['baseline', '0'], ['v2x', '1']].map(([s, n]) => (
+                <button key={s} role="tab" aria-selected={scenario === s}
+                  className={scenario === s ? 'on' : ''} onClick={() => setScenario(s)}>
+                  <span className="br">[</span>{n}<span className="br">]</span>&nbsp;
+                  {s === 'v2x' ? 'V2X-COORDINATED' : 'FIXED-BASELINE'}
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
-        <p className="caveat">Full-V2X arm versus the fixed-signal control over the AM-peak
-        window, identical demand. Gains come from adaptive signal coordination (V2I) and
-        cooperative rerouting (V2V). One honest trade-off: the adaptive controller still
-        teleports ~⅓ more stranded vehicles than fixed timing — the next thing to tighten.</p>
-      </section>
+            <div className="lamp"><span className="rec" />LIVE · 1&nbsp;Hz · SUMO-FCD</div>
+          </div>
 
-      <footer className="colophon">
-        <span>SUMO 1.27.1 · TraCI max-pressure control · scikit-learn / TensorFlow demand model</span>
-        <span>Demand calibrated to DDOT AADT · GEH&lt;5 = 83%</span>
-      </footer>
+          <div className="stage">
+            <canvas ref={canvasRef} />
+            <span className="crop tl" /><span className="crop tr" />
+            <span className="crop bl" /><span className="crop br" />
+            <div className="ovl tl">
+              T {clock}<br />N {onScreen.toString().padStart(3, '0')} VEH<br />
+              V {ms.toFixed(1)} M/S
+            </div>
+            <div className="ovl tr">{scenario === 'v2x' ? 'V2X' : 'BASE'}·{frame.toString().padStart(3, '0')}</div>
+            <div className="ovl br">Δ {delta === 0 ? '±0' : (delta < 0 ? '−' : '+') + Math.abs(delta)} VS {other === 'v2x' ? 'V2X' : 'BASE'}</div>
+          </div>
+
+          <div className="rail">
+            <button className="play" onClick={() => setPlaying((p) => !p)}
+              aria-label={playing ? 'pause' : 'play'}>{playing ? '❚❚' : '▶'}</button>
+            <div className="track">
+              <input className="scrub" type="range" min={0} max={Math.max(0, nFrames - 1)}
+                value={frame} onChange={onScrub} aria-label="timeline" />
+              <div className="ticks" aria-hidden="true" />
+            </div>
+            <div className="fcount">{String(frame + 1).padStart(3, '0')}/{nFrames}</div>
+            <div className="rate">
+              {[1, 2, 4, 8].map((x) => (
+                <button key={x} className={speed === x ? 'on' : ''} onClick={() => setSpeed(x)}>{x}×</button>
+              ))}
+            </div>
+          </div>
+
+          <p className="cap">
+            Each mark is one vehicle, coloured by instantaneous speed. Reds pool at
+            saturated intersections; greens run the arterials. {data.network.length.toLocaleString()} road
+            segments · window {data.window[0]}–{data.window[1]}s · 1&nbsp;Hz from SUMO floating-car data.
+          </p>
+        </section>
+
+        <section className="spec">
+          <div className="spec-h">RESULTS — FULL-V2X vs FIXED CONTROL, AM PEAK</div>
+          <table>
+            <tbody>
+              {FINDINGS.map((f) => (
+                <tr key={f.i}>
+                  <td className="i">{f.i}</td>
+                  <td className="k">{f.k}</td>
+                  <td className="fromto">{f.from}<span>→</span>{f.to}</td>
+                  <td className="dl">{f.d}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="fine">
+            Gains from adaptive signal coordination (V2I) + cooperative rerouting (V2V),
+            identical demand. Trade-off: the adaptive controller teleports ~⅓ more stranded
+            vehicles than fixed timing — the next parameter to tighten.
+          </p>
+        </section>
+
+        <footer className="colo">
+          <span>SUMO 1.27.1 / TraCI MAX-PRESSURE / SCIKIT-LEARN + TENSORFLOW</span>
+          <span>DDOT AADT · GEH&lt;5 = 83%</span>
+        </footer>
+      </main>
     </div>
   )
 }
